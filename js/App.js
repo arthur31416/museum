@@ -3,6 +3,25 @@ import {Platform, StyleSheet, Text, View, Button} from 'react-native';
 import Navigation from 'react-native-navigation';
 import TopTabScreen from './TopTabScreen';
 
+class TextScreen extends Component {
+  render() {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: 'purple',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Text>{this.props.text}</Text>
+      </View>
+    );
+  }
+}
+
+const BUTTON_LEFT = 0;
+const BUTTON_RIGHT = 1;
+
 class WelcomeScreen extends Component {
   static get options() {
     return {
@@ -13,21 +32,19 @@ class WelcomeScreen extends Component {
         largeTitle: false,
         hidden: false,
         textFontSize: 16,
-        textFontFamily: 'HelveticaNeue-Italic',
-        rightButtons: [
-          {
-            id: 0,
-            title: 'One',
-            buttonFontSize: 28,
-            buttonColor: 'red',
-          },
-        ],
+        textFontFamily: 'HelveticaNeue-Semibold',
         leftButtons: [
           {
-            id: 1,
+            id: BUTTON_LEFT,
             icon: require('../img/navicon_add.png'),
-            title: 'Left',
-            buttonColor: 'purple',
+          },
+        ],
+        rightButtons: [
+          {
+            id: BUTTON_RIGHT,
+            title: 'One',
+            buttonFontSize: 16,
+            buttonColor: 'red',
           },
         ],
       },
@@ -39,10 +56,23 @@ class WelcomeScreen extends Component {
     this.push = this.push.bind(this);
   }
 
+  onNavigationButtonPressed(id) {
+    if (id === BUTTON_LEFT) {
+      alert('left pressed');
+    }
+
+    if (id === BUTTON_RIGHT) {
+      alert('right pressed');
+    }
+  }
+
   push() {
     Navigation.push(this.props.componentId, {
       component: {
-        name: 'navigation.playground.YoScreen',
+        name: 'navigation.playground.TextScreen',
+        passProps: {
+          text: 'Stacked',
+        },
       },
     });
   }
@@ -58,13 +88,26 @@ class WelcomeScreen extends Component {
         }}>
         <Text>{this.props.text}</Text>
 
-        <Button onPress={this.push} title="TOGGLE" />
+        <Button onPress={this.push} title="Go to stacked" />
       </View>
     );
   }
 }
 
-class YoScreen extends Component {
+class BookmarkScreen extends Component {
+  static get options() {
+    return {
+      topBar: {
+        title: 'Bookmark',
+        textColor: 'black',
+        drawUnder: false,
+        largeTitle: false,
+        hidden: false,
+        textFontSize: 16,
+      },
+    };
+  }
+
   render() {
     return (
       <View
@@ -74,7 +117,7 @@ class YoScreen extends Component {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Text>FEW</Text>
+        <Text>Bookmark body</Text>
       </View>
     );
   }
@@ -86,63 +129,77 @@ function registerComponents() {
     () => WelcomeScreen,
   );
   Navigation.registerComponent(
-    `navigation.playground.YoScreen`,
-    () => YoScreen,
+    `navigation.playground.BookmarkScreen`,
+    () => BookmarkScreen,
   );
   Navigation.registerComponent(
     `navigation.playground.TopTabScreen`,
     () => TopTabScreen,
   );
+  Navigation.registerComponent(
+    `navigation.playground.TextScreen`,
+    () => TextScreen,
+  );
 }
 
 function start() {
   registerComponents();
-  Navigation.events().onAppLaunched(() => {
-    // Navigation.setRoot({
-    //   bottomTabs: {
-    //     children: [
-    //       {
-    //         component: {
-    //           name: 'navigation.playground.WelcomeScreen',
-    //           passProps: {
-    //             text: 'This is tab 1',
-    //             tabIndex: 0,
-    //             myFunction: () => 'Hello from a function!',
-    //           },
-    //         },
-    //       },
-    //       {
-    //         component: {
-    //           name: 'navigation.playground.WelcomeScreen',
-    //           passProps: {
-    //             tabIndex: 1,
-    //             text: 'This is tab 2',
-    //           },
-    //           options: {
-    //             topBar: {
-    //               title: 'asdasd',
-    //               backgroundColor: '#4aa0d2',
-    //             },
-    //           },
-    //         },
-    //       },
-    //     ],
-    //   },
-    // });
+  console.warn(
+    '-----',
+    Navigation.events(),
+    // Navigation.events().onNavigationButtonPressed,
+  );
+  // Navigation.events().onNavigationButtonPressed(() => {
+  //   console.log('bbbbbbbb');
+  // });
 
+  Navigation.events().onAppLaunched(() => {
     Navigation.setRoot({
-      stack: {
+      bottomTabs: {
         children: [
           {
-            component: {
-              name: 'navigation.playground.WelcomeScreen',
-              passProps: {},
-              options: {
-                topBar: {
-                  title: 'asdasd',
-                  backgroundColor: '#4aa0d2',
+            stack: {
+              children: [
+                {
+                  component: {
+                    name: 'navigation.playground.WelcomeScreen',
+                    passProps: {
+                      text: 'This is tab 1',
+                      myFunction: () => 'Hello from a function!',
+                    },
+                    options: {
+                      bottomTab: {
+                        title: 'Explore',
+                      },
+                      bottomTabs: {
+                        textColor: '#12766b',
+                        selectedTextColor: 'red',
+                        fontFamily: 'HelveticaNeue-Semibold',
+                        fontSize: 13,
+                      },
+                    },
+                  },
                 },
-              },
+              ],
+            },
+          },
+          {
+            stack: {
+              children: [
+                {
+                  component: {
+                    name: 'navigation.playground.BookmarkScreen',
+                    // passProps: {
+                    //   text: 'This is tab 2',
+                    // },
+                    options: {
+                      bottomTab: {
+                        title: 'Bookmarks',
+                      },
+                    },
+                  },
+                },
+              ],
             },
           },
         ],
