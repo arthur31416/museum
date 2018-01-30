@@ -53,3 +53,6 @@ buck-out/
 */fastlane/screenshots
 
 lib/
+
+android/gradle.properties
+android/app/libs
