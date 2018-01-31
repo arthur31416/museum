@@ -56,3 +56,4 @@ lib/
 
 android/gradle.properties
 android/app/libs
+env.js

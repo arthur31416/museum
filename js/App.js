@@ -1,19 +1,58 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, Button} from 'react-native';
 import Navigation from 'react-native-navigation';
-import TopTabScreen from './TopTabScreen';
+import withProvider from './withProvider';
+import {graphql} from 'react-apollo';
+import gql from 'graphql-tag';
+
+const LocationLayout = gql`
+  query getLocation {
+    allLocations {
+      name
+      city
+    }
+  }
+`;
 
 class TextScreen extends Component {
   render() {
     return (
       <View
         style={{
-          flex: 1,
-          backgroundColor: 'purple',
+          backgroundColor: 'palegreen',
           justifyContent: 'center',
           alignItems: 'center',
         }}>
         <Text>{this.props.text}</Text>
+      </View>
+    );
+  }
+}
+
+class Locations extends Component {
+  render() {
+    if (this.props.data.loading) {
+      return <Text>Loading...</Text>;
+    }
+
+    if (this.props.data.error) {
+      return <Text>{JSON.stringify(this.props.data.error)}</Text>;
+    }
+
+    return (
+      <View
+        style={{
+          backgroundColor: 'gold',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {this.props.data.allLocations.map(loc => (
+          <View key={loc.id}>
+            <Text>
+              {loc.name} - {loc.city}
+            </Text>
+          </View>
+        ))}
       </View>
     );
   }
@@ -82,17 +121,21 @@ class WelcomeScreen extends Component {
       <View
         style={{
           flex: 1,
-          backgroundColor: this.props.tabIndex === 0 ? 'pink' : 'yellow',
+          backgroundColor: 'peachpuff',
           justifyContent: 'center',
           alignItems: 'center',
         }}>
         <Text>{this.props.text}</Text>
 
         <Button onPress={this.push} title="Go to stacked" />
+
+        <WelcomeScreenWithLocation />
       </View>
     );
   }
 }
+
+const WelcomeScreenWithLocation = graphql(LocationLayout)(Locations);
 
 class BookmarkScreen extends Component {
   static get options() {
@@ -113,7 +156,7 @@ class BookmarkScreen extends Component {
       <View
         style={{
           flex: 1,
-          backgroundColor: this.props.tabIndex === 0 ? 'pink' : 'yellow',
+          backgroundColor: 'lightcyan',
           justifyContent: 'center',
           alignItems: 'center',
         }}>
@@ -124,18 +167,14 @@ class BookmarkScreen extends Component {
 }
 
 function registerComponents() {
-  Navigation.registerComponent(
-    `navigation.playground.WelcomeScreen`,
-    () => WelcomeScreen,
+  Navigation.registerComponent(`navigation.playground.WelcomeScreen`, () =>
+    withProvider(WelcomeScreen),
   );
-  Navigation.registerComponent(
-    `navigation.playground.BookmarkScreen`,
-    () => BookmarkScreen,
+
+  Navigation.registerComponent(`navigation.playground.BookmarkScreen`, () =>
+    withProvider(BookmarkScreen),
   );
-  Navigation.registerComponent(
-    `navigation.playground.TopTabScreen`,
-    () => TopTabScreen,
-  );
+
   Navigation.registerComponent(
     `navigation.playground.TextScreen`,
     () => TextScreen,
@@ -144,14 +183,6 @@ function registerComponents() {
 
 function start() {
   registerComponents();
-  console.warn(
-    '-----',
-    Navigation.events(),
-    // Navigation.events().onNavigationButtonPressed,
-  );
-  // Navigation.events().onNavigationButtonPressed(() => {
-  //   console.log('bbbbbbbb');
-  // });
 
   Navigation.events().onAppLaunched(() => {
     Navigation.setRoot({
