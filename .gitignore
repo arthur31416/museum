@@ -57,3 +57,5 @@ lib/
 android/gradle.properties
 android/app/libs
 env.js
+ios/museum/main.jsbundle
+ios/museum/main.jsbundle.meta

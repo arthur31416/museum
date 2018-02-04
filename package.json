@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
+    "build:ios": "bsb -make-world -clean-world && react-native bundle --entry-file='index.js' --bundle-output='./ios/museum/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios'",
     "build": "bsb -make-world -clean-world",
     "watch": "bsb -make-world -clean-world -w"
   },
