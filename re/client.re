@@ -8,7 +8,7 @@ type dataObject = {. "__typename": string, "id": string, "key": string};
 let logout = () => ();
 
 /* Create an HTTP Link */
-let httpLink = createHttpLink(~uri="https://api.graph.cool/simple/v1/cjd3am9550ljj0186hqowe4ei", ());
+let httpLink = createHttpLink(~uri=Constants.api.graphql, ());
 
 
 /* Create a Link that handles 401 error responses */

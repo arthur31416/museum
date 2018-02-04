@@ -8,21 +8,31 @@ module LocationQuery = [%graphql {|
       }
   }
 |}];
+
     
 module Query = Client.Instance.Query;
 
-let getLabel = (name, city) => name ++ " - " ++ city;
-let renderLocation = location => <Text value={getLabel(location##name, location##city)} />;
+let component = ReasonReact.statelessComponent("Locations");
 
-let locationQuery = LocationQuery.make();
-let component = <Query query=locationQuery>
-    ...((response, parse) => {
-    switch response {
-      | Loading => <Text value="Loading..." />
-      | Failed(error) => <Text value=error />
-      | Loaded(result) => {
-        let locations = parse(result)##allLocations;
-        ReasonReact.arrayToElement(Array.map(renderLocation, locations));
-      }
-  }})
-</Query>
+let make = ((), _children) => {
+  ...component,
+  render: (_self) => {
+    let locationQuery = LocationQuery.make();
+
+    <Query query=locationQuery>
+      ...((response, parse) => {
+      switch response {
+        | Loading => <Text value="Loading..." />
+        | Failed(error) => <Text value=error />
+        | Loaded(result) => {
+          let allLocations = parse(result)##allLocations;
+          Array.map(
+            location => <Location city=location##city name=location##name />,
+            allLocations
+          )
+          |> ReasonReact.arrayToElement;
+        }
+    }})
+  </Query>
+  }
+};
